@@ -32,8 +32,6 @@ fi
 rm -f pg_profile--4.15--4.16.sql
 # These generation targets need no PostgreSQL build rules or compiler.
 make USE_PGXS=1 PGXS=/dev/null PG_CONFIG=true pg_profile.control pg_profile--4.16.sql pg_profile--4.15--4.16.sql
-# GNU sed doubles backslashes in the psql guards. Match the upstream release guards.
-sed -i '1s/\\\\/\\/g' pg_profile--4.16.sql pg_profile--4.15--4.16.sql
 '@
 
 Push-Location $UpstreamDir
@@ -43,6 +41,19 @@ try {
 }
 finally {
     Pop-Location
+}
+
+# Recipe shells can change the escaping of the upstream psql guards.
+# PostgreSQL skips the guard during CREATE EXTENSION or ALTER EXTENSION UPDATE.
+$guards = @{
+    'pg_profile--4.16.sql' = '\echo Use "CREATE EXTENSION pg_profile" to load this file. \quit'
+    'pg_profile--4.15--4.16.sql' = '\echo Use "ALTER EXTENSION pg_profile UPDATE" to load this file. \quit'
+}
+foreach ($file in $guards.Keys) {
+    $path = Join-Path $UpstreamDir $file
+    $sql = [IO.File]::ReadAllText($path)
+    $lineEnd = $sql.IndexOf("`n")
+    [IO.File]::WriteAllText($path, $guards[$file] + $sql.Substring($lineEnd))
 }
 
 Write-Host "Generated pg_profile control, install SQL, and migration SQL for $PgRoot"

@@ -43,13 +43,17 @@ finally {
     Pop-Location
 }
 
-# GNU sed doubles backslashes in the psql guards. Match the upstream release guards.
-foreach ($file in @('pg_profile--4.16.sql', 'pg_profile--4.15--4.16.sql')) {
+# Recipe shells can change the escaping of the upstream psql guards.
+# PostgreSQL skips the guard during CREATE EXTENSION or ALTER EXTENSION UPDATE.
+$guards = @{
+    'pg_profile--4.16.sql' = '\echo Use "CREATE EXTENSION pg_profile" to load this file. \quit'
+    'pg_profile--4.15--4.16.sql' = '\echo Use "ALTER EXTENSION pg_profile UPDATE" to load this file. \quit'
+}
+foreach ($file in $guards.Keys) {
     $path = Join-Path $UpstreamDir $file
     $sql = [IO.File]::ReadAllText($path)
     $lineEnd = $sql.IndexOf("`n")
-    $guard = $sql.Substring(0, $lineEnd).Replace('\\', '\')
-    [IO.File]::WriteAllText($path, $guard + $sql.Substring($lineEnd))
+    [IO.File]::WriteAllText($path, $guards[$file] + $sql.Substring($lineEnd))
 }
 
 Write-Host "Generated pg_profile control, install SQL, and migration SQL for $PgRoot"

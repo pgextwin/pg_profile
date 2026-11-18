@@ -1,0 +1,37 @@
+{
+  "contractVersion": 2,
+  "extension": "pg_profile",
+  "smokeTest": {
+    "script": "windows/ci/smoke-test.ps1"
+  },
+  "runtimeRequirements": {
+    "extensionCreation": "required",
+    "preload": "none",
+    "backgroundWorker": false,
+    "clientExecutable": {
+      "required": false,
+      "packagePaths": []
+    }
+  },
+  "testSetup": {
+    "preload": "none",
+    "backgroundWorker": false,
+    "settings": []
+  },
+  "coverage": {
+    "createExtension": "covered",
+    "backgroundWorker": "not-applicable",
+    "clientExecutable": "not-applicable",
+    "serverLogAssertions": "not-applicable",
+    "upgrade": "not-covered"
+  },
+  "functionalScenarios": [
+    {
+      "id": "create-profile-and-list-local-server",
+      "description": "Creates pg_profile in a disposable database with dblink and plpgsql, verifies SQL version 4.16, and checks that show_servers() reports the enabled local server.",
+      "evidence": [
+        "sql-result"
+      ]
+    }
+  ]
+}

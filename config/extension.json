@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "name": "pg_profile",
+  "upstream": {
+    "repository": "zubkov-andrei/pg_profile",
+    "ref": "4.16",
+    "version": "4.16",
+    "commit": "0e80bd0251cf1603b72504dc693f78382563495f"
+  },
+  "postgresql": {
+    "majors": [
+      15,
+      16,
+      17,
+      18
+    ]
+  },
+  "windows": {
+    "architecture": "x64"
+  },
+  "license": {
+    "verifyAgainstUpstream": true,
+    "upstreamPath": "LICENSE"
+  }
+}
